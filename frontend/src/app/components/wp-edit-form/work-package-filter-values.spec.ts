@@ -32,7 +32,7 @@ import {HalResourceService} from "core-app/modules/hal/services/hal-resource.ser
 import {Injector} from "@angular/core";
 import {WorkPackageCacheService} from "core-components/work-packages/work-package-cache.service";
 import {SchemaCacheService} from "core-components/schemas/schema-cache.service";
-import {WorkPackageChangeset} from "core-components/wp-edit-form/work-package-changeset";
+import {WorkPackageChangesetset} from "core-components/wp-edit-form/work-package-changeset";
 import {WorkPackageFilterValues} from "core-components/wp-edit-form/work-package-filter-values";
 import {WorkPackageNotificationService} from "core-components/wp-edit/wp-notification.service";
 import {IWorkPackageCreateServiceToken} from "core-components/wp-new/wp-create.service.interface";
@@ -62,7 +62,7 @@ describe('WorkPackageFilterValues', () => {
   let injector:Injector;
   let halResourceService:HalResourceService;
 
-  let changeset:WorkPackageChangeset;
+  let changeset:WorkPackageChangesetset;
   let subject:WorkPackageFilterValues;
   let filters:any[];
   let source:any;
@@ -102,7 +102,7 @@ describe('WorkPackageFilterValues', () => {
     halResourceService = injector.get(HalResourceService);
 
     resource = halResourceService.createHalResourceOfClass(WorkPackageResource, source, true);
-    changeset = new WorkPackageChangeset(injector, resource);
+    changeset = new WorkPackageChangesetset(injector, resource);
 
     let type1 = halResourceService.createHalResourceOfClass(
       TypeResource,
