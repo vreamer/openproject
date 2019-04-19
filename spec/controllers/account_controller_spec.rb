@@ -29,10 +29,6 @@
 require 'spec_helper'
 
 describe AccountController, type: :controller do
-  after do
-    User.delete_all
-    User.current = nil
-  end
   let(:user) { FactoryBot.build_stubbed(:user) }
 
   context 'GET #login' do
@@ -80,7 +76,7 @@ describe AccountController, type: :controller do
   end
 
   context 'POST #login' do
-    let(:admin) { FactoryBot.create(:admin) }
+    using_shared_fixtures :admin
 
     describe 'wrong password' do
       it 'redirects back to login' do
@@ -229,7 +225,7 @@ describe AccountController, type: :controller do
     end
 
     context 'GET #logout' do
-      let(:admin) { FactoryBot.create(:admin) }
+      using_shared_fixtures :admin
 
       it 'calls reset_session' do
         expect(@controller).to receive(:reset_session).once
