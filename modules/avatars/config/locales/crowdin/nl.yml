@@ -1,7 +1,7 @@
 nl:
-  label_avatar: "Avatar"
-  label_current_avatar: "Current Avatar"
-  label_choose_avatar: "Choose Avatar from file"
+  label_avatar: "Profielfoto"
+  label_current_avatar: "Huidige avatar"
+  label_choose_avatar: "Kies Avatar uit bestand"
   message_avatar_uploaded: "Avatar changed successfully."
   error_image_upload: "Error saving the image."
   error_image_size: "The image is too large."
