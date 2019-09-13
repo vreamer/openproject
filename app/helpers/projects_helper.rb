@@ -287,4 +287,13 @@ module ProjectsHelper
   def sorted_by_lft?
     @sort_criteria.first_key == 'lft'
   end
+
+  def allowed_parent_projects(project)
+    if project.persisted?
+      Projects::UpdateContract
+    else
+      Projects::CreateContract
+    end.new(project, current_user)
+       .assignable_parents
+  end
 end

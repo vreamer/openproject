@@ -202,25 +202,6 @@ class Project < ActiveRecord::Base
     visible.like(query)
   end
 
-  # TODO: move into SetAttributesService
-  def initialize(attributes = nil)
-    super
-
-    initialized = (attributes || {}).stringify_keys
-    if !initialized.key?('identifier') && Setting.sequential_project_identifiers?
-      self.identifier = Project.next_identifier
-    end
-    if !initialized.key?('is_public')
-      self.is_public = Setting.default_projects_public?
-    end
-    if !initialized.key?('enabled_module_names')
-      self.enabled_module_names = Setting.default_projects_modules
-    end
-    if !initialized.key?('types') && !initialized.key?('type_ids')
-      self.types = ::Type.default
-    end
-  end
-
   def possible_members(criteria, limit)
     Principal.active_or_registered.like(criteria).not_in_project(self).limit(limit)
   end
@@ -344,71 +325,6 @@ class Project < ActiveRecord::Base
     return false if ancestors.detect { |a| !a.active? }
 
     update_attribute :status, STATUS_ACTIVE
-  end
-
-  # TODO: Move into contract
-  # Returns an array of projects the project can be moved to
-  # by the current user
-  def allowed_parents
-    return @allowed_parents if @allowed_parents
-
-    @allowed_parents = Project.allowed_to(User.current, :add_subprojects)
-    @allowed_parents = @allowed_parents - self_and_descendants
-    if User.current.allowed_to?(:add_project, nil, global: true) || (!new_record? && parent.nil?)
-      @allowed_parents << nil
-    end
-    unless parent.nil? || @allowed_parents.empty? || @allowed_parents.include?(parent)
-      @allowed_parents << parent
-    end
-    @allowed_parents
-  end
-
-  # TODO: Move into contract
-  def allowed_parent?(p)
-    p = guarantee_project_or_nil_or_false(p)
-    return false if p == false # have to explicitly check for false
-
-    !((p.nil? && persisted? && allowed_parents.empty?) ||
-      (p.present? && allowed_parents.exclude?(p)))
-  end
-
-  # Sets the parent of the project with authorization check
-  def set_allowed_parent!(p)
-    set_parent!(p) if allowed_parent?(p)
-  end
-
-  # Sets the parent of the project
-  # Argument can be either a Project, a String, a Fixnum or nil
-  def set_parent!(p)
-    p = guarantee_project_or_nil_or_false(p)
-    return false if p == false # have to explicitly check for false
-
-    if p == parent && !p.nil?
-      # Nothing to do
-      true
-    elsif p.nil? || (p.active? && move_possible?(p))
-      # Insert the project so that target's children or root projects stay alphabetically sorted
-      sibs = (p.nil? ? self.class.roots : p.children)
-      to_be_inserted_before = sibs.detect { |c| c.name.to_s.downcase > name.to_s.downcase }
-      if to_be_inserted_before
-        move_to_left_of(to_be_inserted_before)
-      elsif p.nil?
-        if sibs.empty?
-          # move_to_root adds the project in first (ie. left) position
-          move_to_root
-        else
-          move_to_right_of(sibs.last) unless self == sibs.last
-        end
-      else
-        # move_to_child_of adds the project in last (ie.right) position
-        move_to_child_of(p)
-      end
-      WorkPackage.update_versions_from_hierarchy_change(self)
-      true
-    else
-      # Can not move to the given target
-      false
-    end
   end
 
   def types_used_by_work_packages

@@ -37,7 +37,7 @@ class Grids::UpdateService < ::BaseServices::Update
     super
   end
 
-  def after_save
+  def after_save(*)
     model.touch if only_widgets_updated?
   end
 
