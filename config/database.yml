@@ -1,0 +1,14 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  username: openproject
+  password: openproject-dev-password
+
+development:
+  <<: *default
+  database: openproject_dev
+
+test:
+  <<: *default
+  database: openproject_test
