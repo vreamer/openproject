@@ -6,6 +6,10 @@ RAILS_ENV="${RAILS_ENV:="development"}"
 
 USE_PUMA="${USE_PUMA:="false"}"
 
+echo "Starting web process from script web"
+echo "Environment $RAILS_ENV"
+echo "PUMA $USE_PUMA"
+
 if [ "$RAILS_ENV" = "production" ] && [ "$USE_PUMA" = "true" ]; then
 	# @TODO Add apache config to serve the assets. Until then we have Puma serve
 	#       them which is slower. This is ok if an asset host is used (SaaS).
